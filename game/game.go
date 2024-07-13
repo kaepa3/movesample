@@ -58,11 +58,11 @@ func init() {
 	}
 	fontFace = &text.GoTextFace{Source: src, Size: fontSize}
 
-	mainChar, err = charactor.CharactorCreate("./move/1123.png", 0, groundPos, charSize, "")
+	mainChar, err = charactor.CharactorCreate("./game/1123.png", 0, groundPos, charSize, "")
 	if err != nil {
 		log.Fatal(err)
 	}
-	robotChar, err = charactor.CharactorCreate("./move/robot.png", 0, groundPos, charSize+20, "nemui")
+	robotChar, err = charactor.CharactorCreate("./game/robot.png", 0, groundPos, charSize+20, "nemui")
 	if err != nil {
 		log.Fatal(err)
 	}
