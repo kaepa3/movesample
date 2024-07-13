@@ -1,4 +1,4 @@
-package move
+package game
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/kaepa3/move/move/charactor"
+	"github.com/kaepa3/move/game/charactor"
 )
 
 const (
