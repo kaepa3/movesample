@@ -3,7 +3,6 @@ package game
 import (
 	"bytes"
 	_ "embed"
-	"fmt"
 	"log"
 	"math/rand"
 	"sync"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kaepa3/move/game/charactor"
 )
@@ -35,17 +33,18 @@ var (
 type GameMode int
 
 const (
-	Move GameMode = iota
-	Ask
+	Title GameMode = iota
+	Search
 )
 
 type Game struct {
-	Mode GameMode
-	Lock bool
+	Mode       GameMode
+	TitleGame  TitleGame
+	SearchGame SearchGame
 }
 
 func NewGame() (*Game, error) {
-	g := Game{}
+	g := Game{Title, TitleGame{1}, SearchGame{}}
 	return &g, nil
 }
 
@@ -70,27 +69,10 @@ func init() {
 
 func (g *Game) Update() error {
 	switch g.Mode {
-	case Move:
-		if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-			if mainChar.PosX+1 <= ScreenWidth {
-				mainChar.PosX += 1
-			}
-		} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-			if mainChar.PosX-1 > 0 {
-				mainChar.PosX -= 1
-			}
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			if robotChar.IsNear(mainChar) {
-				g.Mode = Ask
-			}
-		}
-	case Ask:
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			if !g.Lock {
-				g.Mode = Move
-			}
-		}
+	case Title:
+		g.Mode = g.TitleGame.Update()
+	case Search:
+		g.SearchGame.Update()
 	}
 	return nil
 }
@@ -98,17 +80,12 @@ func (g *Game) Update() error {
 var once sync.Once
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	mainChar.Draw(screen)
-	robotChar.Draw(screen)
 	switch g.Mode {
-	case Ask:
-		op := &text.DrawOptions{}
-		op.GeoM.Translate(0, groundPos+charSize)
-		text.Draw(screen, robotChar.Text, fontFace, op)
+	case Title:
+		g.TitleGame.Draw(screen)
+	case Search:
+		g.SearchGame.Draw(screen)
 	}
-	pop := &text.DrawOptions{}
-	serifu := fmt.Sprintf("%d:%d %d:%d", mainChar.PosX, mainChar.PosY, robotChar.PosX, robotChar.PosY)
-	text.Draw(screen, serifu, fontFace, pop)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
